@@ -26,14 +26,20 @@ stages:
 
           # Create backend infrastructure
           - task: AzureCLI@2
+            displayName: 'Create Backend Infrastructure'
             inputs:
               azureSubscription: $(azureServiceConnection)
               scriptType: 'bash'
               scriptLocation: 'inlineScript'
               inlineScript: |
-                az group create --name $(backendResourceGroup) --location "East US" || true
-                az storage account create --name $(backendStorageAccount) --resource-group $(backendResourceGroup) --location "East US" --sku Standard_LRS || true
-                az storage container create --name $(backendContainer) --account-name $(backendStorageAccount) --auth-mode login || true
+                set -e
+                echo "Creating resource group..."
+                az group create --name $(backendResourceGroup) --location "East US"
+                echo "Creating storage account..."
+                az storage account create --name $(backendStorageAccount) --resource-group $(backendResourceGroup) --location "East US" --sku Standard_LRS
+                echo "Creating container..."
+                az storage container create --name $(backendContainer) --account-name $(backendStorageAccount) --auth-mode login
+                echo "Backend infrastructure created successfully"
 
           # Initialize Terraform
           - task: TerraformTaskV4@4
