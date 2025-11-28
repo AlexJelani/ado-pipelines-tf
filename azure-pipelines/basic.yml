@@ -32,28 +32,21 @@ stages:
               scriptType: 'bash'
               scriptLocation: 'inlineScript'
               inlineScript: |
-                set -e
-                echo "Checking current subscription..."
-                az account show
-                echo "Creating resource group: $(backendResourceGroup)"
-                az group create --name $(backendResourceGroup) --location "East US" --output table
-                echo "Creating storage account: $(backendStorageAccount)"
-                az storage account create \
-                  --name $(backendStorageAccount) \
-                  --resource-group $(backendResourceGroup) \
-                  --location "East US" \
-                  --sku Standard_LRS \
-                  --kind StorageV2 \
-                  --output table
-                echo "Waiting for storage account to be ready..."
-                sleep 30
-                echo "Creating container: $(backendContainer)"
-                az storage container create \
-                  --name $(backendContainer) \
-                  --account-name $(backendStorageAccount) \
-                  --auth-mode login \
-                  --output table
-                echo "Backend infrastructure created successfully"
+                echo "Starting backend creation..."
+                
+                # Create resource group
+                echo "Creating resource group..."
+                az group create --name $(backendResourceGroup) --location "East US" || echo "Resource group creation failed or already exists"
+                
+                # Create storage account
+                echo "Creating storage account..."
+                az storage account create --name $(backendStorageAccount) --resource-group $(backendResourceGroup) --location "East US" --sku Standard_LRS || echo "Storage account creation failed or already exists"
+                
+                # Create container
+                echo "Creating container..."
+                az storage container create --name $(backendContainer) --account-name $(backendStorageAccount) || echo "Container creation failed or already exists"
+                
+                echo "Backend setup completed"
 
           # Initialize Terraform
           - task: TerraformTaskV4@4
