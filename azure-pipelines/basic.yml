@@ -57,6 +57,7 @@ stages:
               backendAzureRmStorageAccountName: $(backendStorageAccount)
               backendAzureRmContainerName: $(backendContainer)
               backendAzureRmKey: $(backendKey)
+              backendAzureRmUseAzureADAuthentication: true
               command: 'init'  # Initialize Terraform
               workingDirectory: 'terraform'  # Set the working directory
 
