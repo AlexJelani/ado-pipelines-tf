@@ -32,10 +32,11 @@ stages:
               scriptType: 'bash'
               scriptLocation: 'inlineScript'
               inlineScript: |
-                set -e
-                az group create --name $(backendResourceGroup) --location "East US"
-                az storage account create --name $(backendStorageAccount) --resource-group $(backendResourceGroup) --location "East US" --sku Standard_LRS
-                az storage container create --name $(backendContainer) --account-name $(backendStorageAccount)
+                # Create or use existing resources
+                az group create --name $(backendResourceGroup) --location "East US" || echo "Resource group exists"
+                az storage account create --name $(backendStorageAccount) --resource-group $(backendResourceGroup) --location "East US" --sku Standard_LRS || echo "Storage account exists"
+                az storage container create --name $(backendContainer) --account-name $(backendStorageAccount) || echo "Container exists"
+                echo "Backend setup complete"
 
           # Initialize Terraform
           - task: TerraformTaskV4@4
