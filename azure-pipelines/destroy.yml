@@ -1,24 +1,25 @@
+trigger: none  # Manual trigger only
+
 pool:
   name: 'Default'
 
 variables:
-  terraformVersion: '1.5.5'  # Specify the Terraform version
-  azureServiceConnection: 'azurerm'  # Azure service connection name
+  terraformVersion: '1.5.5'
+  azureServiceConnection: 'azurerm'
   backendResourceGroup: 'skink-rg'
-  backendStorageAccount: 'skinktfstate'  # Remote backend storage account
-  backendContainer: 'tfstate'  # Remote backend storage container
-  backendKey: 'terraform.tfstate'  # State file name in remote backend
+  backendStorageAccount: 'mytfstate2024lb'
+  backendContainer: 'tfstate'
+  backendKey: 'terraform.tfstate'
 
 stages:
-  - stage: Initialization
+  - stage: Destroy
     jobs:
-      - job: TerraformInit
+      - job: TerraformDestroy
         steps:
-          - task: TerraformInstaller@0  # Install Terraform
+          - task: TerraformInstaller@0
             inputs:
               terraformVersion: $(terraformVersion)
 
-          # Initialize Terraform
           - task: TerraformTaskV4@4
             inputs:
               provider: 'azurerm'
@@ -27,19 +28,14 @@ stages:
               backendAzureRmStorageAccountName: $(backendStorageAccount)
               backendAzureRmContainerName: $(backendContainer)
               backendAzureRmKey: $(backendKey)
-              command: 'init'  # Initialize Terraform
-              workingDirectory: 'terraform'  # Set the working directory
-
-          # Validate Terraform configuration
-          - task: TerraformTaskV4@4
-            inputs:
-              provider: 'azurerm'
-              command: 'validate'  # Validate Terraform configuration
+              backendAzureRmUseAzureADAuthentication: true
+              command: 'init'
               workingDirectory: 'terraform'
+
           - task: TerraformTaskV4@4
             inputs:
               provider: 'azurerm'
-              command: 'destroy'  # Run terraform destroy
-              commandOptions: '--auto-approve'  # Automatically approve the destroy action
-              environmentServiceNameAzureRM: $(azureServiceConnection)  # Azure service connection for authentication
-              workingDirectory: 'terraform'  # Set the working directory
+              command: 'destroy'
+              commandOptions: '--auto-approve'
+              environmentServiceNameAzureRM: $(azureServiceConnection)
+              workingDirectory: 'terraform'
