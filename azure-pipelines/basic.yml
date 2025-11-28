@@ -24,40 +24,10 @@ stages:
             inputs:
               terraformVersion: $(terraformVersion)
 
-          # Create backend infrastructure
-          - task: AzureCLI@2
-            displayName: 'Create Backend Infrastructure'
-            inputs:
-              azureSubscription: $(azureServiceConnection)
-              scriptType: 'bash'
-              scriptLocation: 'inlineScript'
-              inlineScript: |
-                echo "Starting backend creation..."
-                
-                # Create resource group
-                echo "Creating resource group..."
-                az group create --name $(backendResourceGroup) --location "East US" || echo "Resource group creation failed or already exists"
-                
-                # Create storage account
-                echo "Creating storage account..."
-                az storage account create --name $(backendStorageAccount) --resource-group $(backendResourceGroup) --location "East US" --sku Standard_LRS || echo "Storage account creation failed or already exists"
-                
-                # Create container
-                echo "Creating container..."
-                az storage container create --name $(backendContainer) --account-name $(backendStorageAccount) || echo "Container creation failed or already exists"
-                
-                echo "Backend setup completed"
-
           # Initialize Terraform
           - task: TerraformTaskV4@4
             inputs:
               provider: 'azurerm'
-              backendServiceArm: $(azureServiceConnection)
-              backendAzureRmResourceGroupName: $(backendResourceGroup)
-              backendAzureRmStorageAccountName: $(backendStorageAccount)
-              backendAzureRmContainerName: $(backendContainer)
-              backendAzureRmKey: $(backendKey)
-              backendAzureRmUseAzureADAuthentication: true
               command: 'init'  # Initialize Terraform
               workingDirectory: 'terraform'  # Set the working directory
 
