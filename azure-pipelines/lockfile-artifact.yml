@@ -61,6 +61,18 @@ stages:
               artifactName: 'terraform-state'
               downloadPath: 'terraform'
 
+          # Initialize Terraform
+          - task: TerraformTaskV4@4
+            inputs:
+              provider: 'azurerm'
+              backendServiceArm: $(azureServiceConnection)
+              backendAzureRmResourceGroupName: $(backendResourceGroup)
+              backendAzureRmStorageAccountName: $(backendStorageAccount)
+              backendAzureRmContainerName: $(backendContainer)
+              backendAzureRmKey: $(backendKey)
+              command: 'init'  # Initialize Terraform
+              workingDirectory: 'terraform'  # Set the working directory
+
           - task: TerraformTaskV4@4
             inputs:
               provider: 'azurerm'
@@ -79,6 +91,18 @@ stages:
             inputs:
               artifactName: 'terraform-state'
               downloadPath: 'terraform'
+
+          # Initialize Terraform
+          - task: TerraformTaskV4@4
+            inputs:
+              provider: 'azurerm'
+              backendServiceArm: $(azureServiceConnection)
+              backendAzureRmResourceGroupName: $(backendResourceGroup)
+              backendAzureRmStorageAccountName: $(backendStorageAccount)
+              backendAzureRmContainerName: $(backendContainer)
+              backendAzureRmKey: $(backendKey)
+              command: 'init'  # Initialize Terraform
+              workingDirectory: 'terraform'  # Set the working directory
               
           - task: TerraformTaskV4@4
             inputs:
